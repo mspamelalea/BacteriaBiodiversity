@@ -1,5 +1,4 @@
 # BacteriaBiodiversity
-Plotly graphs of JSON data
 A scientific investigation into plausibility of finding the right bacteria
 to synthesize proteins that taste like beef. The right bacteria may exist in 
 someone's belly button. This study collected belly button bacteria and other data from participants including:
@@ -10,6 +9,9 @@ someone's belly button. This study collected belly button bacteria and other dat
 - city/state
 - belly button type
 - wash frequency
+
+You can find the functioning webpage here: 
+https://mspamelalea.github.io/BacteriaBiodiversity/index.html
 
 ## Screenshots from the Bacteria Portfolio
 When the participant's id is chosen from the drop-down menu,
@@ -50,5 +52,5 @@ index.html - to render the webpage.
 - Data-Driven Documents (D3) JavaScript library
 - Bootstrap
 - HTML
-- css
+- Plotly
 - VS Code
