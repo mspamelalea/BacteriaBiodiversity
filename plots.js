@@ -83,7 +83,7 @@ function init() {
       console.log(otu_idsArray);
       console.log(otu_labelsArray);
     
-      // Concatenate "OTU "to the out_id 
+      // Concatenate "OTU "to the otu_id 
       // This makes the value a string and the y-axis
       // will have ten values instead of a large
       // range of integers
@@ -96,11 +96,11 @@ function init() {
         y: OTUs,
         type: 'bar',
         orientation: 'h',      //horizontal
-        text: otu_labelsArray,  //hover label
-};
+        text: otu_labelsArray  //hover label
+      };
       var layoutBar = {
         xaxis: {
-        title: "Sample's Bacterial Count",
+        title: "Sample's Bacterial Count"
        },
         yaxis: {
         title: 'Operational Taxonomic Unit #'
@@ -110,7 +110,27 @@ function init() {
 
       data = [trace];  
       Plotly.newPlot('bar', data, layoutBar); // html div id="bar"
-  });
+
+      //Bubble Chart
+      var btrace = {
+        x: resultArray[0].otu_ids,
+        y: resultArray[0].sample_values,
+        text: resultArray[0].otu_labels,
+        mode: 'markers',
+        marker: {
+          color: resultArray[0].otu_ids,
+          size: resultArray[0].sample_values
+        } 
+      };
+      
+      var layoutBubble = {
+        title: 'Size of Each OTU Sample',
+        xaxis: {title: 'OTU ID'},
+        yaxis: {title: "Sample's Bacterial Count"}
+      };
+      data = [btrace]
+      Plotly.newPlot('bubble', data, layoutBubble);
+  });   
 }
 init();
   
