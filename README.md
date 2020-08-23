@@ -10,7 +10,7 @@ someone's belly button. This study collected belly button bacteria and other dat
 - belly button type
 - wash frequency
 
-You can find the functioning webpage here: 
+You can find the webpage here: 
 https://mspamelalea.github.io/BacteriaBiodiversity/index.html
 
 ## Screenshots from the Bacteria Portfolio
