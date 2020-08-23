@@ -83,27 +83,33 @@ function init() {
       console.log(otu_idsArray);
       console.log(otu_labelsArray);
     
+      // Concatenate "OTU "to the out_id 
+      // This makes the value a string and the y-axis
+      // will have ten values instead of a large
+      // range of integers
+      var OTUs = otu_idsArray.map((num) => "OTU " + num);
+      console.log(OTUs);
+
       //Horizontal Bar Chart
       var trace = {
         x: valuesArray,
-        y: otu_idsArray,
+        y: OTUs,
         type: 'bar',
         orientation: 'h',      //horizontal
         text: otu_labelsArray,  //hover label
-      };
+};
       var layoutBar = {
         xaxis: {
-        type: 'category',
-        title: 'Sample Value',
+        title: "Sample's Bacterial Count",
        },
-      yaxis: {
-      range: [otu_idsArray],
-      title: 'OTUs'
-      },
-      title: "Top Ten Bacterial Species\nin Participant's Navel"
+        yaxis: {
+        title: 'Operational Taxonomic Unit #'
+       },
+        title: "Top Ten Bacterial Species <br> in Participant's Navel"
       };
+
       data = [trace];  
-      Plotly.newPlot('bar', data, layoutBar); //div id="bar"
+      Plotly.newPlot('bar', data, layoutBar); // html div id="bar"
   });
 }
 init();
