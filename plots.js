@@ -2,7 +2,7 @@ function init() {
     var selector = d3.select("#selDataset");
   
     d3.json("samples.json").then((data) => {
-      console.log(data);
+      //console.log(data);
       var sampleNames = data.names;
       sampleNames.forEach((sample) => {
         selector
@@ -13,13 +13,33 @@ function init() {
       //initailize the DOM on first time with first item in array
       buildMetadata(sampleNames[0]);
       buildCharts(sampleNames[0]);
-  })};
+    }); // end loop through json
+}; //end init
   
-  // repopulate page if item is clicked/changed on the dropdown
-  function optionChanged(newSample) {
-    buildMetadata(newSample);
-    buildCharts(newSample);
-  };
+// repopulate page if item is clicked/changed on the dropdown
+function optionChanged(newSample) {
+  buildMetadata(newSample);
+  buildCharts(newSample);
+}; //end optionChanged
+
+function plotGauge(washFreq){
+  // Gauge Chart
+  //reference: https://plotly.com/javascript/indicator/
+
+  var gtrace = {
+    domain: { x: [0, 1],
+              y: [0, 1] 
+            },
+    value: washFreq,
+    title: 'Belly Button Washing Frequency <br> Scrubs Per Week',
+    type: 'indicator',
+    mode: 'gauge+number', 
+    gauge: { axis: { range: [null, 10] }     
+    }};
+
+  data = [gtrace]
+  Plotly.newPlot('gauge', data);
+}; //end plotGauge
 
 // json file looks like this:
 // {
@@ -39,99 +59,106 @@ function init() {
 //   "sample_values": [163,126,...],
 //   "otu_labels": ["Bacteria;Bacteriodetes;....."]....
 //}]
+
   // build the small pane with the demographics
-  function buildMetadata(sample) { //sample is the id number from the dropdown
-    // the entire json file becomes 'data'
-    d3.json("samples.json").then((data) => {
-      
-      var metadata = data.metadata;
-      var resultArray = metadata.filter(sampleObj => sampleObj.id == sample);
-      var result = resultArray[0];
-      //result looks like this:
-      // {id: 940, ethnicity: "Caucasian", gender: "F", age: 24, location: "Beaufort/NC", …}
-      console.log(result)
-      var PANEL = d3.select("#sample-metadata");
-  
-      PANEL.html("");
-      PANEL.append("h6").text("ID: " + result.id);
-      PANEL.append("h6").text("Ethnicity: " + result.ethnicity);
-      PANEL.append("h6").text("Gender: " + result.gender);
-      PANEL.append("h6").text("Age: " + result.age);
-      PANEL.append("h6").text("Location: " + result.location);
-      PANEL.append("h6").text("bbtype: " + result.bbtype);
-      PANEL.append("h6").text("wfreq: " + result.wfreq);
-      
-    });
-  };
+function buildMetadata(sample) { //sample is the id number from the dropdown
+  // the entire json file becomes 'data'
+  d3.json("samples.json").then((data) => {
+    
+    var metadata = data.metadata;
+    var resultArray = metadata.filter(sampleObj => sampleObj.id == sample);
+    var result = resultArray[0];
+    //result looks like this:
+    // {id: 940, ethnicity: "Caucasian", gender: "F", age: 24, location: "Beaufort/NC", …}
+    //console.log(result)
+
+    washFreq = result.wfreq;
+    plotGauge(washFreq);
+
+    var PANEL = d3.select("#sample-metadata");
+
+    PANEL.html("");
+    PANEL.append("h6").text("ID: " + result.id);
+    PANEL.append("h6").text("Ethnicity: " + result.ethnicity);
+    PANEL.append("h6").text("Gender: " + result.gender);
+    PANEL.append("h6").text("Age: " + result.age);
+    PANEL.append("h6").text("Location: " + result.location);
+    PANEL.append("h6").text("bbtype: " + result.bbtype);
+    PANEL.append("h6").text("wfreq: " + result.wfreq);
+    
+  }); //end loop through json
+};//end buildMetadata
+
 // "samples":[{
 //   "id":"940",
 //   "otu_ids": [1167,2859,.....],
 //   "sample_values": [163,126,...],
 //   "otu_labels": ["Bacteria;Bacteriodetes;....."]....
-  function buildCharts(sample) {
-   
-    d3.json("samples.json").then((data) => {
-      // get "sample_values" from samples
-      var samples = data.samples;
-      var resultArray = samples.filter(sampleObj => sampleObj.id == sample);
-      console.log(resultArray);
-      //Get top 10 elements for each array
-      var valuesArray = resultArray[0].sample_values.slice(0,10).reverse();
-      var otu_idsArray = resultArray[0].otu_ids.slice(0,10).reverse();
-      var otu_labelsArray = resultArray[0].otu_labels.slice(0,10).reverse();
-      console.log(valuesArray);
-      console.log(otu_idsArray);
-      console.log(otu_labelsArray);
+function buildCharts(sample) {
+  
+  d3.json("samples.json").then((data) => {
+    // get "sample_values" from samples
+    var samples = data.samples;
+    var resultArray = samples.filter(sampleObj => sampleObj.id == sample);
+    //console.log(resultArray);
+    //Get top 10 elements for each array
+    var valuesArray = resultArray[0].sample_values.slice(0,10).reverse();
+    var otu_idsArray = resultArray[0].otu_ids.slice(0,10).reverse();
+    var otu_labelsArray = resultArray[0].otu_labels.slice(0,10).reverse();
+    //console.log(valuesArray);
+    //console.log(otu_idsArray);
+    //console.log(otu_labelsArray);
+  
+    // Concatenate "OTU "to the otu_id 
+    // This makes the value a string and the y-axis
+    // will have ten values instead of a large
+    // range of integers
+    var OTUs = otu_idsArray.map((num) => "OTU " + num);
+    //console.log(OTUs);
+
+    //Horizontal Bar Chart
+    var trace = {
+      x: valuesArray,
+      y: OTUs,
+      type: 'bar',
+      orientation: 'h',      //horizontal
+      text: otu_labelsArray  //hover label
+    };
+    var layoutBar = {
+      xaxis: {
+      title: "Sample's Bacterial Count"
+      },
+      yaxis: {
+      title: 'Operational Taxonomic Unit #'
+      },
+      title: "Top Ten Bacterial Species <br> in Participant's Navel"
+    };
+
+    data = [trace];  
+    Plotly.newPlot('bar', data, layoutBar); // html div id="bar"
+
+    //Bubble Chart
+    var btrace = {
+      x: resultArray[0].otu_ids,
+      y: resultArray[0].sample_values,
+      text: resultArray[0].otu_labels,
+      mode: 'markers',
+      marker: {
+        color: resultArray[0].otu_ids,
+        size: resultArray[0].sample_values
+      } 
+    };
     
-      // Concatenate "OTU "to the otu_id 
-      // This makes the value a string and the y-axis
-      // will have ten values instead of a large
-      // range of integers
-      var OTUs = otu_idsArray.map((num) => "OTU " + num);
-      console.log(OTUs);
+    var layoutBubble = {
+      title: 'Size of Each OTU Sample',
+      xaxis: {title: 'OTU ID'},
+      yaxis: {title: "Sample's Bacterial Count"}
+    };
+    data = [btrace]
+    Plotly.newPlot('bubble', data, layoutBubble);
+  }); //end json loop
+}//end buildCharts
 
-      //Horizontal Bar Chart
-      var trace = {
-        x: valuesArray,
-        y: OTUs,
-        type: 'bar',
-        orientation: 'h',      //horizontal
-        text: otu_labelsArray  //hover label
-      };
-      var layoutBar = {
-        xaxis: {
-        title: "Sample's Bacterial Count"
-       },
-        yaxis: {
-        title: 'Operational Taxonomic Unit #'
-       },
-        title: "Top Ten Bacterial Species <br> in Participant's Navel"
-      };
-
-      data = [trace];  
-      Plotly.newPlot('bar', data, layoutBar); // html div id="bar"
-
-      //Bubble Chart
-      var btrace = {
-        x: resultArray[0].otu_ids,
-        y: resultArray[0].sample_values,
-        text: resultArray[0].otu_labels,
-        mode: 'markers',
-        marker: {
-          color: resultArray[0].otu_ids,
-          size: resultArray[0].sample_values
-        } 
-      };
-      
-      var layoutBubble = {
-        title: 'Size of Each OTU Sample',
-        xaxis: {title: 'OTU ID'},
-        yaxis: {title: "Sample's Bacterial Count"}
-      };
-      data = [btrace]
-      Plotly.newPlot('bubble', data, layoutBubble);
-  });   
-}
 init();
   
   
